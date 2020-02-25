@@ -1,13 +1,11 @@
 <?php
 
-namespace Stripe\Service\Issuing;
+namespace Stripe\Service;
 
-class CardService extends \Stripe\Service\AbstractService
+class PlanService extends \Stripe\Service\AbstractService
 {
     /**
-     * Returns a list of Issuing <code>Card</code> objects. The objects are sorted in
-     * descending order by creation date, with the most recently created object
-     * appearing first.
+     * Returns a list of your plans.
      *
      * @param null|array $params
      * @param null|array|\Stripe\Util\RequestOptions $opts
@@ -18,28 +16,28 @@ class CardService extends \Stripe\Service\AbstractService
      */
     public function all($params = null, $opts = null)
     {
-        return $this->request('get', '/v1/issuing/cards', $params, $opts);
+        return $this->request('get', '/v1/plans', $params, $opts);
     }
 
     /**
-     * Creates an Issuing <code>Card</code> object.
+     * You can create plans using the API, or in the Stripe <a
+     * href="https://dashboard.stripe.com/subscriptions/products">Dashboard</a>.
      *
      * @param null|array $params
      * @param null|array|\Stripe\Util\RequestOptions $opts
      *
      * @throws \Stripe\Exception\ApiErrorException if the request fails
      *
-     * @return Card
+     * @return Plan
      */
     public function create($params = null, $opts = null)
     {
-        return $this->request('post', '/v1/issuing/cards', $params, $opts);
+        return $this->request('post', '/v1/plans', $params, $opts);
     }
 
     /**
-     * For virtual cards only. Retrieves an Issuing <code>card_details</code> object
-     * that contains <a href="/docs/issuing/cards/management#virtual-card-info">the
-     * sensitive details</a> of a virtual card.
+     * Deleting plans means new subscribers can’t be added. Existing subscribers aren’t
+     * affected.
      *
      * @param string $id
      * @param null|array $params
@@ -47,15 +45,15 @@ class CardService extends \Stripe\Service\AbstractService
      *
      * @throws \Stripe\Exception\ApiErrorException if the request fails
      *
-     * @return Card
+     * @return Plan
      */
-    public function details($id, $params = null, $opts = null)
+    public function delete($id, $params = null, $opts = null)
     {
-        return $this->request('get', $this->buildPath('/v1/issuing/cards/%s/details', $id), $params, $opts);
+        return $this->request('delete', $this->buildPath('/v1/plans/%s', $id), $params, $opts);
     }
 
     /**
-     * Retrieves an Issuing <code>Card</code> object.
+     * Retrieves the plan with the given ID.
      *
      * @param string $id
      * @param null|array $params
@@ -63,16 +61,17 @@ class CardService extends \Stripe\Service\AbstractService
      *
      * @throws \Stripe\Exception\ApiErrorException if the request fails
      *
-     * @return Card
+     * @return Plan
      */
     public function retrieve($id, $params = null, $opts = null)
     {
-        return $this->request('get', $this->buildPath('/v1/issuing/cards/%s', $id), $params, $opts);
+        return $this->request('get', $this->buildPath('/v1/plans/%s', $id), $params, $opts);
     }
 
     /**
-     * Updates the specified Issuing <code>Card</code> object by setting the values of
-     * the parameters passed. Any parameters not provided will be left unchanged.
+     * Updates the specified plan by setting the values of the parameters passed. Any
+     * parameters not provided are left unchanged. By design, you cannot change a
+     * plan’s ID, amount, currency, or billing cycle.
      *
      * @param string $id
      * @param null|array $params
@@ -80,10 +79,10 @@ class CardService extends \Stripe\Service\AbstractService
      *
      * @throws \Stripe\Exception\ApiErrorException if the request fails
      *
-     * @return Card
+     * @return Plan
      */
     public function update($id, $params = null, $opts = null)
     {
-        return $this->request('post', $this->buildPath('/v1/issuing/cards/%s', $id), $params, $opts);
+        return $this->request('post', $this->buildPath('/v1/plans/%s', $id), $params, $opts);
     }
 }

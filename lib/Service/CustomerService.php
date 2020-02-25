@@ -2,13 +2,16 @@
 
 namespace Stripe\Service;
 
-class CustomerService extends AbstractService
+class CustomerService extends \Stripe\Service\AbstractService
 {
     /**
-     * List all customers.
+     * Returns a list of your customers. The customers are returned sorted by creation
+     * date, with the most recent customers appearing first.
      *
      * @param null|array $params
      * @param null|array|\Stripe\Util\RequestOptions $opts
+     *
+     * @throws \Stripe\Exception\ApiErrorException if the request fails
      *
      * @return \Stripe\Collection
      */
@@ -18,54 +21,63 @@ class CustomerService extends AbstractService
     }
 
     /**
-     * List customer balance transactions.
+     * Returns a list of transactions that updated the customer’s <a
+     * href="/docs/api/customers/object#customer_object-balance"><code>balance</code></a>.
      *
-     * @param string $parentId
+     * @param string $id
      * @param null|array $params
      * @param null|array|\Stripe\Util\RequestOptions $opts
+     *
+     * @throws \Stripe\Exception\ApiErrorException if the request fails
      *
      * @return \Stripe\Collection
      */
-    public function allBalanceTransactions($parentId, $params = null, $opts = null)
+    public function allBalanceTransactions($id, $params = null, $opts = null)
     {
-        return $this->request('get', $this->buildPath('/v1/customers/%s/balance_transactions', $parentId), $params, $opts);
+        return $this->request('get', $this->buildPath('/v1/customers/%s/balance_transactions', $id), $params, $opts);
     }
 
     /**
-     * List all sources.
+     * List sources for a specified customer.
      *
-     * @param string $parentId
+     * @param string $id
      * @param null|array $params
      * @param null|array|\Stripe\Util\RequestOptions $opts
+     *
+     * @throws \Stripe\Exception\ApiErrorException if the request fails
      *
      * @return \Stripe\Collection
      */
-    public function allSources($parentId, $params = null, $opts = null)
+    public function allSources($id, $params = null, $opts = null)
     {
-        return $this->request('get', $this->buildPath('/v1/customers/%s/sources', $parentId), $params, $opts);
+        return $this->request('get', $this->buildPath('/v1/customers/%s/sources', $id), $params, $opts);
     }
 
     /**
-     * List all tax IDs.
+     * Returns a list of tax IDs for a customer.
      *
-     * @param string $parentId
+     * @param string $id
      * @param null|array $params
      * @param null|array|\Stripe\Util\RequestOptions $opts
+     *
+     * @throws \Stripe\Exception\ApiErrorException if the request fails
      *
      * @return \Stripe\Collection
      */
-    public function allTaxIds($parentId, $params = null, $opts = null)
+    public function allTaxIds($id, $params = null, $opts = null)
     {
-        return $this->request('get', $this->buildPath('/v1/customers/%s/tax_ids', $parentId), $params, $opts);
+        return $this->request('get', $this->buildPath('/v1/customers/%s/tax_ids', $id), $params, $opts);
     }
 
     /**
-     * Create a customer.
+     * Creates a new customer object.
      *
      * @param null|array $params
      * @param null|array|\Stripe\Util\RequestOptions $opts
      *
-     * @return \Stripe\Customer
+     * @throws \Stripe\Exception\ApiErrorException if the request fails
+     *
+     * @return Customer
      */
     public function create($params = null, $opts = null)
     {
@@ -73,55 +85,71 @@ class CustomerService extends AbstractService
     }
 
     /**
-     * Create a balance transaction.
-     *
-     * @param string $parentId
-     * @param null|array $params
-     * @param null|array|\Stripe\Util\RequestOptions $opts
-     *
-     * @return \Stripe\CustomerBalanceTransaction
-     */
-    public function createBalanceTransaction($parentId, $params = null, $opts = null)
-    {
-        return $this->request('post', $this->buildPath('/v1/customers/%s/balance_transactions', $parentId), $params, $opts);
-    }
-
-    /**
-     * Create a source.
-     *
-     * @param string $parentId
-     * @param null|array $params
-     * @param null|array|\Stripe\Util\RequestOptions $opts
-     *
-     * @return \Stripe\BankAccount|\Stripe\Card|\Stripe\Source
-     */
-    public function createSource($parentId, $params = null, $opts = null)
-    {
-        return $this->request('post', $this->buildPath('/v1/customers/%s/sources', $parentId), $params, $opts);
-    }
-
-    /**
-     * Create a tax ID.
-     *
-     * @param string $parentId
-     * @param null|array $params
-     * @param null|array|\Stripe\Util\RequestOptions $opts
-     *
-     * @return \Stripe\TaxId
-     */
-    public function createTaxId($parentId, $params = null, $opts = null)
-    {
-        return $this->request('post', $this->buildPath('/v1/customers/%s/tax_ids', $parentId), $params, $opts);
-    }
-
-    /**
-     * Delete a customer.
+     * Creates an immutable transaction that updates the customer’s <a
+     * href="/docs/api/customers/object#customer_object-balance"><code>balance</code></a>.
      *
      * @param string $id
      * @param null|array $params
      * @param null|array|\Stripe\Util\RequestOptions $opts
      *
-     * @return \Stripe\Customer
+     * @throws \Stripe\Exception\ApiErrorException if the request fails
+     *
+     * @return CustomerBalanceTransaction
+     */
+    public function createBalanceTransaction($id, $params = null, $opts = null)
+    {
+        return $this->request('post', $this->buildPath('/v1/customers/%s/balance_transactions', $id), $params, $opts);
+    }
+
+    /**
+     * When you create a new credit card, you must specify a customer or recipient on
+     * which to create it.
+     *
+     * If the card’s owner has no default card, then the new card will become the
+     * default. However, if the owner already has a default, then it will not change.
+     * To change the default, you should <a href="/docs/api#update_customer">update the
+     * customer</a> to have a new <code>default_source</code>.
+     *
+     * @param string $id
+     * @param null|array $params
+     * @param null|array|\Stripe\Util\RequestOptions $opts
+     *
+     * @throws \Stripe\Exception\ApiErrorException if the request fails
+     *
+     * @return Source
+     */
+    public function createSource($id, $params = null, $opts = null)
+    {
+        return $this->request('post', $this->buildPath('/v1/customers/%s/sources', $id), $params, $opts);
+    }
+
+    /**
+     * Creates a new <code>TaxID</code> object for a customer.
+     *
+     * @param string $id
+     * @param null|array $params
+     * @param null|array|\Stripe\Util\RequestOptions $opts
+     *
+     * @throws \Stripe\Exception\ApiErrorException if the request fails
+     *
+     * @return TaxId
+     */
+    public function createTaxId($id, $params = null, $opts = null)
+    {
+        return $this->request('post', $this->buildPath('/v1/customers/%s/tax_ids', $id), $params, $opts);
+    }
+
+    /**
+     * Permanently deletes a customer. It cannot be undone. Also immediately cancels
+     * any active subscriptions on the customer.
+     *
+     * @param string $id
+     * @param null|array $params
+     * @param null|array|\Stripe\Util\RequestOptions $opts
+     *
+     * @throws \Stripe\Exception\ApiErrorException if the request fails
+     *
+     * @return Customer
      */
     public function delete($id, $params = null, $opts = null)
     {
@@ -129,43 +157,16 @@ class CustomerService extends AbstractService
     }
 
     /**
-     * Delete a customer discount.
-     *
-     * @param string $id
-     * @param null|array $params
-     * @param null|array|\Stripe\Util\RequestOptions $opts
-     *
-     * @return \Stripe\Discount
-     */
-    public function deleteDiscount($id, $params = null, $opts = null)
-    {
-        return $this->request('delete', $this->buildPath('/v1/customers/%s/discount', $id), $params, $opts);
-    }
-
-    /**
-     * Delete a source.
+     * Deletes an existing <code>TaxID</code> object.
      *
      * @param string $parentId
-     * @param string $id
      * @param null|array $params
      * @param null|array|\Stripe\Util\RequestOptions $opts
+     * @param mixed $id
      *
-     * @return \Stripe\BankAccount|\Stripe\Card|\Stripe\Source
-     */
-    public function deleteSource($parentId, $id, $params = null, $opts = null)
-    {
-        return $this->request('delete', $this->buildPath('/v1/customers/%s/sources/%s', $parentId, $id), $params, $opts);
-    }
-
-    /**
-     * Delete a tax ID.
+     * @throws \Stripe\Exception\ApiErrorException if the request fails
      *
-     * @param string $parentId
-     * @param string $id
-     * @param null|array $params
-     * @param null|array|\Stripe\Util\RequestOptions $opts
-     *
-     * @return \Stripe\TaxId
+     * @return TaxId
      */
     public function deleteTaxId($parentId, $id, $params = null, $opts = null)
     {
@@ -173,13 +174,32 @@ class CustomerService extends AbstractService
     }
 
     /**
-     * Retrieve a customer.
+     * Removes the currently applied discount on a customer.
      *
      * @param string $id
      * @param null|array $params
      * @param null|array|\Stripe\Util\RequestOptions $opts
      *
-     * @return \Stripe\Customer
+     * @throws \Stripe\Exception\ApiErrorException if the request fails
+     *
+     * @return Customer
+     */
+    public function deleteDiscount($id, $params = null, $opts = null)
+    {
+        return $this->request('delete', $this->buildPath('/v1/customers/%s/discount', $id), $params, $opts);
+    }
+
+    /**
+     * Retrieves the details of an existing customer. You need only supply the unique
+     * customer identifier that was returned upon customer creation.
+     *
+     * @param string $id
+     * @param null|array $params
+     * @param null|array|\Stripe\Util\RequestOptions $opts
+     *
+     * @throws \Stripe\Exception\ApiErrorException if the request fails
+     *
+     * @return Customer
      */
     public function retrieve($id, $params = null, $opts = null)
     {
@@ -187,14 +207,17 @@ class CustomerService extends AbstractService
     }
 
     /**
-     * Retrieve a balance transaction.
+     * Retrieves a specific transaction that updated the customer’s <a
+     * href="/docs/api/customers/object#customer_object-balance"><code>balance</code></a>.
      *
      * @param string $parentId
-     * @param string $id
      * @param null|array $params
      * @param null|array|\Stripe\Util\RequestOptions $opts
+     * @param mixed $id
      *
-     * @return \Stripe\CustomerBalanceTransaction
+     * @throws \Stripe\Exception\ApiErrorException if the request fails
+     *
+     * @return CustomerBalanceTransaction
      */
     public function retrieveBalanceTransaction($parentId, $id, $params = null, $opts = null)
     {
@@ -202,14 +225,16 @@ class CustomerService extends AbstractService
     }
 
     /**
-     * Retrieve a source.
+     * Retrieve a specified source for a given customer.
      *
      * @param string $parentId
-     * @param string $id
      * @param null|array $params
      * @param null|array|\Stripe\Util\RequestOptions $opts
+     * @param mixed $id
      *
-     * @return \Stripe\BankAccount|\Stripe\Card|\Stripe\Source
+     * @throws \Stripe\Exception\ApiErrorException if the request fails
+     *
+     * @return Source
      */
     public function retrieveSource($parentId, $id, $params = null, $opts = null)
     {
@@ -217,14 +242,16 @@ class CustomerService extends AbstractService
     }
 
     /**
-     * Retrieve a tax ID.
+     * Retrieves the <code>TaxID</code> object with the given identifier.
      *
      * @param string $parentId
-     * @param string $id
      * @param null|array $params
      * @param null|array|\Stripe\Util\RequestOptions $opts
+     * @param mixed $id
      *
-     * @return \Stripe\TaxId
+     * @throws \Stripe\Exception\ApiErrorException if the request fails
+     *
+     * @return TaxId
      */
     public function retrieveTaxId($parentId, $id, $params = null, $opts = null)
     {
@@ -232,13 +259,27 @@ class CustomerService extends AbstractService
     }
 
     /**
-     * Update a customer.
+     * Updates the specified customer by setting the values of the parameters passed.
+     * Any parameters not provided will be left unchanged. For example, if you pass the
+     * <strong>source</strong> parameter, that becomes the customer’s active source
+     * (e.g., a card) to be used for all charges in the future. When you update a
+     * customer to a new valid card source by passing the <strong>source</strong>
+     * parameter: for each of the customer’s current subscriptions, if the subscription
+     * bills automatically and is in the <code>past_due</code> state, then the latest
+     * open invoice for the subscription with automatic collection enabled will be
+     * retried. This retry will not count as an automatic retry, and will not affect
+     * the next regularly scheduled payment for the invoice. Changing the
+     * <strong>default_source</strong> for a customer will not trigger this behavior.
+     *
+     * This request accepts mostly the same arguments as the customer creation call.
      *
      * @param string $id
      * @param null|array $params
      * @param null|array|\Stripe\Util\RequestOptions $opts
      *
-     * @return \Stripe\Customer
+     * @throws \Stripe\Exception\ApiErrorException if the request fails
+     *
+     * @return Customer
      */
     public function update($id, $params = null, $opts = null)
     {
@@ -246,47 +287,20 @@ class CustomerService extends AbstractService
     }
 
     /**
-     * Update a balance transaction.
+     * Most customer balance transaction fields are immutable, but you may update its
+     * <code>description</code> and <code>metadata</code>.
      *
      * @param string $parentId
-     * @param string $id
      * @param null|array $params
      * @param null|array|\Stripe\Util\RequestOptions $opts
+     * @param mixed $id
      *
-     * @return \Stripe\CustomerBalanceTransaction
+     * @throws \Stripe\Exception\ApiErrorException if the request fails
+     *
+     * @return CustomerBalanceTransaction
      */
     public function updateBalanceTransaction($parentId, $id, $params = null, $opts = null)
     {
         return $this->request('post', $this->buildPath('/v1/customers/%s/balance_transactions/%s', $parentId, $id), $params, $opts);
-    }
-
-    /**
-     * Update a source.
-     *
-     * @param string $parentId
-     * @param string $id
-     * @param null|array $params
-     * @param null|array|\Stripe\Util\RequestOptions $opts
-     *
-     * @return \Stripe\BankAccount|\Stripe\Card|\Stripe\Source
-     */
-    public function updateSource($parentId, $id, $params = null, $opts = null)
-    {
-        return $this->request('post', $this->buildPath('/v1/customers/%s/sources/%s', $parentId, $id), $params, $opts);
-    }
-
-    /**
-     * Verify a source.
-     *
-     * @param string $parentId
-     * @param string $id
-     * @param null|array $params
-     * @param null|array|\Stripe\Util\RequestOptions $opts
-     *
-     * @return \Stripe\BankAccount
-     */
-    public function verifySource($parentId, $id, $params = null, $opts = null)
-    {
-        return $this->request('post', $this->buildPath('/v1/customers/%s/sources/%s/verify', $parentId, $id), $params, $opts);
     }
 }
